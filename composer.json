@@ -3,7 +3,8 @@
   "description": "WordPress http2.",
   "keywords": [
     "wordpress",
-    "widgets"
+    "http2",
+    "server push",
   ],
   "homepage": "https://github.com/wpsmith/HTTP2",
   "license": "GPL-2.0+",
@@ -19,13 +20,13 @@
     "issues": "https://github.com/wpsmith/HTTP2/issues"
   },
   "require": {
-    "php": ">=5.2.4"
+    "php": ">=5.2.4",
+    "wpsmith/functions": "^0.0.1",
+    "wpsmith/singleton": "0.0.1"
   },
   "autoload": {
     "psr-4": {
-      "WPS\\HTTP2\\": "src/",
-      "wpsmith/functions": "^0.0.1",
-      "wpsmith/singleton": "0.0.1"
+      "WPS\\HTTP2\\": "src/"
     }
   }
 }
