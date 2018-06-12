@@ -1,0 +1,31 @@
+{
+  "name": "wpsmith/http2",
+  "description": "WordPress http2.",
+  "keywords": [
+    "wordpress",
+    "widgets"
+  ],
+  "homepage": "https://github.com/wpsmith/WPS-Http2",
+  "license": "GPL-2.0+",
+  "authors": [
+    {
+      "name": "Travis Smith",
+      "email": "t@wpsmith.net",
+      "homepage": "http://wpsmith.net/",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/wpsmith/WPS-Http2/issues"
+  },
+  "require": {
+    "php": ">=5.2.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "WPS\\HTTP2\\": "src/",
+      "wpsmith/wps-functions": "^0.0.1",
+      "wpsmith/wps-singleton": "0.0.1"
+    }
+  }
+}
