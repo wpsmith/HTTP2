@@ -4,7 +4,7 @@
   "keywords": [
     "wordpress",
     "http2",
-    "server push",
+    "server push"
   ],
   "homepage": "https://github.com/wpsmith/HTTP2",
   "license": "GPL-2.0+",
