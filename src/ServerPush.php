@@ -12,7 +12,7 @@
  * @copyright 2014 Travis Smith, WP Smith, LLC
  */
 
-namespace WPS\HTTP2;
+namespace WPS\WP\HTTP2;
 
 use WPS\Core;
 
@@ -21,13 +21,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! class_exists( 'WPS\HTTP2\Server_Push' ) ) {
+if ( ! class_exists( __NAMESPACE__ . '\ServerPush' ) ) {
 	/**
 	 * Class Server_Push
 	 *
 	 * @package WPS\HTTP2
 	 */
-	class Server_Push extends Core\Singleton {
+	class ServerPush extends Core\Singleton {
 
 		/**
 		 * Max header size.
