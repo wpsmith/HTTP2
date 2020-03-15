@@ -20,9 +20,9 @@
     "issues": "https://github.com/wpsmith/HTTP2/issues"
   },
   "require": {
-    "php": ">=5.6.0",
-    "wpsmith/functions": "^0.0.1",
-    "wpsmith/singleton": "0.0.2"
+    "php": ">=7.2.0",
+    "wpsmith/functions": "dev-master",
+    "wpsmith/singleton": "^1.0.2"
   },
   "autoload": {
     "psr-4": {
