@@ -14,7 +14,7 @@
 
 namespace WPS\WP\HTTP2;
 
-use WPS\Core;
+use WPS\Core\Singleton;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -27,7 +27,7 @@ if ( ! class_exists( __NAMESPACE__ . '\ServerPush' ) ) {
 	 *
 	 * @package WPS\HTTP2
 	 */
-	class ServerPush extends Core\Singleton {
+	class ServerPush extends Singleton {
 
 		/**
 		 * Max header size.
@@ -88,18 +88,18 @@ if ( ! class_exists( __NAMESPACE__ . '\ServerPush' ) ) {
 		 * @param array $hints Hints to push.
 		 */
 		public function __construct( $hints = array() ) {
-			if ( is_admin() || ! is_ssl() ) {
+			if ( \is_admin() || ! \is_ssl() ) {
 				return;
 			}
 
-			$this->internal_url = $this->parse_url( get_bloginfo( 'url' ) );
+			$this->internal_url = $this->parse_url( \get_bloginfo( 'url' ) );
 
-			add_action( 'wp_enqueue_scripts', array( $this, 'prepare_headers' ), 9998 );
-			add_action( 'wp_enqueue_scripts', array( $this, 'send_headers' ), 9999 );
+			\add_action( 'wp_enqueue_scripts', array( $this, 'prepare_headers' ), 9998 );
+			\add_action( 'wp_enqueue_scripts', array( $this, 'send_headers' ), 9999 );
 
 			$this->hints = $hints;
-			add_action( 'wp_head', array( $this, 'resource_hints' ), 99, 1 );
-			add_filter( 'wp_resource_hints', array( $this, 'required_resource_hints' ), 1, 2 );
+			\add_action( 'wp_head', array( $this, 'resource_hints' ), 99, 1 );
+			\add_filter( 'wp_resource_hints', array( $this, 'required_resource_hints' ), 1, 2 );
 
 		}
 
@@ -127,12 +127,12 @@ if ( ! class_exists( __NAMESPACE__ . '\ServerPush' ) ) {
 		 */
 		public function prepare_headers( $wp ) {
 			// Get all Loaded Scripts (JS).
-			foreach ( wp_scripts()->queue as $script ) {
+			foreach ( \wp_scripts()->queue as $script ) {
 				$this->do_script_style( $script, 'script' );
 			}
 
 			// Get all Loaded Styles (CSS).
-			foreach ( wp_styles()->queue as $style ) {
+			foreach ( \wp_styles()->queue as $style ) {
 				$this->do_script_style( $style, 'style' );
 			}
 
@@ -149,10 +149,10 @@ if ( ! class_exists( __NAMESPACE__ . '\ServerPush' ) ) {
 		private function get_item( $type, $handle ) {
 
 			if ( 'style' === $type ) {
-				return ( isset( wp_styles()->registered[ $handle ] ) ? wp_styles()->registered[ $handle ] : new \stdClass() );
+				return ( isset( \wp_styles()->registered[ $handle ] ) ? \wp_styles()->registered[ $handle ] : new \stdClass() );
 			}
 
-			return ( isset( wp_scripts()->registered[ $handle ] ) ? wp_scripts()->registered[ $handle ] : new \stdClass() );
+			return ( isset( \wp_scripts()->registered[ $handle ] ) ? \wp_scripts()->registered[ $handle ] : new \stdClass() );
 		}
 
 		/**
@@ -164,7 +164,7 @@ if ( ! class_exists( __NAMESPACE__ . '\ServerPush' ) ) {
 		 */
 		private function parse_url( $url ) {
 
-			$u = function_exists( 'wp_parse_url' ) ? wp_parse_url( $url ) : parse_url( $url );
+			$u = function_exists( 'wp_parse_url' ) ? \wp_parse_url( $url ) : parse_url( $url );
 			return $u;
 			
 		}
@@ -191,9 +191,9 @@ if ( ! class_exists( __NAMESPACE__ . '\ServerPush' ) ) {
 			}
 
 			if ( ! empty( $item->ver ) ) {
-				$item->src = add_query_arg( 'ver', $item->ver, $item->src );
+				$item->src = \add_query_arg( 'ver', $item->ver, $item->src );
 			}
-			$this->do_header( set_url_scheme( $item->src, 'relative' ), $type );
+			$this->do_header( \set_url_scheme( $item->src, 'relative' ), $type );
 			if ( ! empty( $item->deps ) ) {
 				foreach ( $item->deps as $dep ) {
 					$this->do_script_style( $dep, $type );
@@ -259,7 +259,7 @@ if ( ! class_exists( __NAMESPACE__ . '\ServerPush' ) ) {
 		 * @return boolean true if the plugin should render resource hints.
 		 */
 		public function should_render_prefetch_headers() {
-			return apply_filters( 'http2_render_resource_hints', ! function_exists( 'wp_resource_hints' ) );
+			return \apply_filters( 'http2_render_resource_hints', ! function_exists( 'wp_resource_hints' ) );
 		}
 
 		/**
@@ -289,7 +289,7 @@ if ( ! class_exists( __NAMESPACE__ . '\ServerPush' ) ) {
 		 * @param string $type   Type of asset.
 		 */
 		public function do_item_link( $handle, $type ) {
-			$item = \WPS\get_script_style_dependency( $type, $handle );
+			$item = $this->get_item( $type, $handle );
 			if ( $item->src ) {
 				printf(
 					'<link name="%s" rel="preload" href="%s" as="%s">',
@@ -305,15 +305,15 @@ if ( ! class_exists( __NAMESPACE__ . '\ServerPush' ) ) {
 		 * These encourage preload/prefetch behavior when HTTP/2 support is lacking.
 		 */
 		public function resource_hints() {
-			if ( is_admin() || ! $this->should_render_prefetch_headers() ) {
+			if ( \is_admin() || ! $this->should_render_prefetch_headers() ) {
 				return;
 			}
 
-			foreach ( wp_scripts()->queue as $dep ) {
+			foreach ( \wp_scripts()->queue as $dep ) {
 				$this->do_item_link( $dep, 'script' );
 			}
 
-			foreach ( wp_styles()->queue as $dep ) {
+			foreach ( \wp_styles()->queue as $dep ) {
 				$this->do_item_link( $dep, 'style' );
 			}
 
@@ -331,6 +331,7 @@ if ( ! class_exists( __NAMESPACE__ . '\ServerPush' ) ) {
 		public function required_resource_hints( $urls, $relation_type ) {
 			$this->resource_hint_urls = array_merge( $this->resource_hint_urls, $urls );
 			if ( 'dns-prefetch' === $relation_type ) {
+				// TODO: Determine whether gravatar is required.
 				$urls[] = 'secure.gravatar.com';
 				$urls[] = 'www.gravatar.com';
 				if ( in_array( 'fonts.googleapis.com', $this->resource_hint_urls, true ) ) {
